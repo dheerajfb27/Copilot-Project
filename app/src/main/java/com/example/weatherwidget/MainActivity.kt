@@ -10,8 +10,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var cityText: TextView
@@ -38,7 +40,10 @@ class MainActivity : AppCompatActivity() {
             val city = cityInput.text.toString().trim()
             if (city.isNotEmpty()) {
                 preferences.setCity(city)
-                showWeather(WeatherRepository.getWeatherForCity(city, preferences.getApiKey()))
+                lifecycleScope.launch {
+                    val weather = WeatherRepository.fetchWeatherByCity(city)
+                    showWeather(weather)
+                }
             } else {
                 requestLocationWeather()
             }
@@ -62,21 +67,30 @@ class MainActivity : AppCompatActivity() {
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            val city = preferences.getCity()
-            val weather = if (location != null) {
-                WeatherRepository.getWeatherForCity(city, preferences.getApiKey())
-            } else {
-                WeatherRepository.getWeatherForCity(city, preferences.getApiKey())
+            lifecycleScope.launch {
+                if (location != null) {
+                    val weather = WeatherRepository.fetchWeatherByCoords(
+                        location.latitude,
+                        location.longitude,
+                        preferences.getCity()
+                    )
+                    showWeather(weather)
+                } else {
+                    val city = preferences.getCity()
+                    val weather = WeatherRepository.fetchWeatherByCity(city)
+                    showWeather(weather)
+                }
             }
-            showWeather(weather)
         }
     }
 
     private fun showWeather(weather: WeatherData) {
-        cityText.text = weather.city
-        tempText.text = weather.tempText
-        conditionText.text = weather.summary
-        WeatherRepository.saveWeather(this, weather)
+        runOnUiThread {
+            cityText.text = weather.city
+            tempText.text = weather.tempText
+            conditionText.text = weather.summary
+            WeatherRepository.saveWeather(this, weather)
+        }
     }
 
     override fun onRequestPermissionsResult(

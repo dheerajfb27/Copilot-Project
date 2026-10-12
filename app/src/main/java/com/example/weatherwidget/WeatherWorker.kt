@@ -11,8 +11,11 @@ class WeatherWorker(
     override suspend fun doWork(): Result {
         val prefs = WeatherPreferences(applicationContext)
         val city = prefs.getCity()
-        val apiKey = prefs.getApiKey()
-        val weather = WeatherRepository.getWeatherForCity(city, apiKey)
+        val weather = try {
+            WeatherRepository.fetchWeatherByCity(city)
+        } catch (e: Exception) {
+            WeatherRepository.placeholderWeather(city)
+        }
         WeatherRepository.saveWeather(applicationContext, weather)
         return Result.success()
     }

@@ -1,31 +1,20 @@
-# Weather Widget Android App
+# Weather Widget Android App (Live Open-Meteo)
 
-This project creates a simple Android weather widget app designed for a Pixel-style home screen.
+This project now integrates live weather using the free Open-Meteo APIs (no API key required) and Open-Meteo geocoding for city -> coordinates.
 
-## Features
-- Home screen widget with temperature, location, and weather summary
-- Device location permission support with manual city fallback
-- Refresh button and periodic widget updates
-- Placeholder OpenWeatherMap configuration so the project compiles without a real API key
-- GitHub Actions workflow to build a debug APK
+What changed
+- Uses Open-Meteo geocoding API to resolve city names
+- Uses Open-Meteo forecast API to fetch current weather (current_weather)
+- Retrofit + Gson + Coroutines networking
+- Worker and UI updated to fetch and display live weather
+- No API key required — the app works out-of-the-box using public Open-Meteo endpoints
 
-## Prerequisites
-- Android Studio Hedgehog or newer
-- JDK 17
-- Android SDK with API 34 installed
+Notes
+- Periodic updates are still driven by WorkManager (hourly)
+- Location-based fetch requires FINE_LOCATION permission; Worker uses the saved city preference
+- You can change the default city in app UI
 
-## Setup
-1. Open the project in Android Studio.
-2. Create a local `local.properties` file if needed with your SDK path.
-3. Add your OpenWeatherMap API key in `WeatherRepository.kt` or replace the placeholder logic with a real retrofit call.
-4. Build the app from Android Studio or run:
-   - `./gradlew assembleDebug`
-
-## GitHub Actions
-The workflow is in `.github/workflows/android-debug.yml` and builds a debug APK automatically.
-
-## App icon and symbol
-This project includes a launcher icon and widget icon resource in:
-- `app/src/main/res/drawable/ic_launcher_foreground.xml`
-- `app/src/main/res/drawable/ic_weather_symbol.xml`
-- `app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml`
+How to build
+1. Open in Android Studio
+2. ./gradlew assembleDebug
+3. Run the GitHub Actions workflow to produce an APK artifact
