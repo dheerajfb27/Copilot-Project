@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Weather Widget</string>
+    <string name="refresh">Refresh</string>
+    <string name="manual_city_hint">Enter a city</string>
+    <string name="status_unknown">Weather data unavailable</string>
+    <string name="widget_temp_placeholder">--°</string>
+    <string name="widget_city_placeholder">City</string>
+</resources>
